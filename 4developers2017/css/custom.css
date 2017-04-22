@@ -1,0 +1,26 @@
+img.inline {
+    height: 1em;
+    width: 1em;
+    border: none !important;
+    vertical-align: middle;
+    box-shadow: none !important;
+}
+
+div.leftcol {
+    text-align: left;
+    float: left;
+}
+
+div.rightcol {
+    text-align: right;
+    float: right;
+}
+
+.csharp {
+    font-size: 80% !important;
+    line-height: 100% !important;
+}
+
+li {
+    font-size: 80%;
+}

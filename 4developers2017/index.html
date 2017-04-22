@@ -1,0 +1,503 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Functional developer in object-oriented world - Bartosz Sokół</title>
+
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/simple.css">
+	<link rel="stylesheet" href="css/custom.css">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/github-gist.css">
+
+	<!-- Printing and PDF exports -->
+	<script>
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+		document.getElementsByTagName('head')[0].appendChild(link);
+	</script>
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h2>Functional developer in object-oriented world</h2>
+				<p>How F# helped me to write better C#</p>
+				<br>
+				<p>Bartosz Sokół</p>
+				<p><small><img src="img/twitter.png" class="inline" /> @bartsokol</small></p>
+				<p><small>4developers 2017</small></p>
+			</section>
+
+			<section>
+				<h2>Who am I?</h2>
+				<ul>
+					<li>Software developer with 12+ years of hands-on experience</li>
+					<li>Used to work with many languages, including C#, F#, JavaScript, PHP, Python and more</li>
+					<li>Charmed by functional programming, especially in ML flavour</li>
+					<li>Occasional blogger at <a href="http://bart-sokol.info">bart-sokol.info</a></li>
+					<li>Twitter spammer @bartsokol</li>
+					<li>Conference junkie on permanent rehab</li>
+					<li>Hobbyist traveller and photographer</li>
+				</ul>
+			</section>
+
+			<section>
+				<section>
+					<h2>The Beginning</h2>
+					<p>Object-Oriented Pain</p>
+				</section>
+
+				<section>
+					<h2>What did we start with?</h2>
+					<ul>
+						<li>Legacy solution with many projects in it</li>
+						<li>Logic split into multiple projects and services</li>
+						<li>Improperly approached microservice architecture</li>
+						<li>Layers, layers of layers, and more layers</li>
+						<li>Sorry, I got lost in layers</li>
+						<li>Oh, and patterns...</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Welcome to the Patternland</h2>
+					<div class="leftcol">
+						<ul>
+							<li>Controller</li>
+							<li>Facade</li>
+							<li>Handler</li>
+							<li>Provider</li>
+							<li>Proxy</li>
+							<li>Wrapper</li>
+							<li>Repository</li>
+						</ul>
+					</div>
+					<div class="rightcol">
+						<ul>
+							<li>Coordinator</li>
+							<li>Builder</li>
+							<li>Factory</li>
+							<li>Decorator</li>
+							<li>Memoize</li>
+							<li>Grinder</li>
+							<li>...</li>
+						</ul>
+					</div>
+				</section>
+
+				<section>
+					<h2>Problems</h2>
+					<ul>
+						<li>Distributed logic made the code hard to reason about</li>
+						<li>The only thing you could expect was unexpected</li>
+						<li>Handling errors was a pain - will it throw?</li>
+						<li>Can it be null or not?</li>
+						<li>Going deep vs going forward - stack overflow in my head</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>What to do with it?</h2>
+					<p>
+						The challenge - one feature needs to be added to our solution.
+					</p>
+					<ul>
+						<li>Keep patching current code?</li>
+						<li>Move code a bit / rewrite some parts using the same approach?</li>
+						<li>Full rewrite using the different approach?</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>The alternative</h2>
+					<p>Functional relief</p>
+				</section>
+
+				<section>
+					<h2>F# Success Story</h2>
+					<ul>
+						<li>We've created and deployed our first F# project in late 2016</li>
+						<li>It took around 1 week to develop it</li>
+						<li>Stateless rule engine, getting data from external services and doing calculations</li>
+						<li>Used in production since December 2016</li>
+						<li>3 months passed and still no bugs or other issues raised</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Lessons learned</h2>
+					<ul>
+						<li>Explicit is better than implicit</li>
+						<li>Implicit is better than boilerplate</li>
+						<li>Don't fear the static</li>
+						<li>The most important "pattern" is composition</li>
+						<li>Functions can solve almost any issue</li>
+						<li>Test the most important things in detail, the others on a higher level</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Key takeaways</h2>
+					<ul>
+						<li><code>Result&lt;T&gt;</code> type - for handling errors</li>
+						<li><code>Option&lt;T&gt;</code> type - for representing non-existent values</li>
+						<li><code>Map</code> and <code>Bind</code> functions for combining calls</li>
+						<li>FTW! |> Pipe operator -> composition</li>
+						<li>API design - RPC-like style vs REST</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>Result&lt;T&gt; type</h2>
+					<ul>
+						<li>It can be either a Success or a Failure</li>
+						<li>If a function can fail, it should return Result&lt;T&gt;</li>
+						<li>Result needs to be handled explicitly</li>
+						<li>If we encounter any expected exception, we wrap it into Result (details captured in Error type)</li>
+						<li>It's a struct with default value of Failure, so even if you take shortcuts you won't get null reference exceptions so easily</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2><code>Result&lt;T&gt; - F#</code></h2>
+					<pre>
+						<code class="fsharp hljs">
+type Result&lt;'a&gt; = Success of 'a | Failure of Error
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h2><code>Result&lt;T&gt; - C#</code></h2>
+					<pre>
+						<code class="csharp hljs" data-trim>
+public struct Result&lt;T&gt; : IEquatable&lt;Result&lt;T&gt;&gt;
+{
+	public Result(T value)
+	{
+		Value = value;
+		IsSuccess = true;
+	}
+
+	public Result(Error error)
+	{
+		Error = error;
+	}
+
+	public T Value { get; }
+	public Error Error { get; }
+	public bool IsSuccess { get; }
+	public bool IsFailure => !IsSuccess;
+
+	(...Equals and ToString overloads go here...)
+}
+						</code>
+					</pre>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>Option&lt;T&gt; type</h2>
+					<ul>
+						<li>It can be either Some value or None</li>
+						<li>If a value in a data structure is optional, it is wrapped into Option&lt;T&gt;</li>
+						<li>More explicit than reference and nullable types</li>
+						<li>A bit harder to work with than nulls (no built-in language support), but it pays back quickly</li>
+						<li>It's a struct with default value of None</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2><code>Option&lt;T&gt; - F#</code></h2>
+					<pre>
+						<code class="fsharp hljs">
+type Option&lt;'a&gt; = Some of 'a | None
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h2><code>Option&lt;T&gt; - C#</code></h2>
+					<pre>
+						<code class="csharp hljs" data-trim>
+public struct Option&lt;T&gt; : IEquatable&lt;Option&lt;T&gt;&gt;
+{
+	public Option(T value)
+	{
+		Value = value;
+		IsSome = true;
+	}
+
+	public T Value { get; }
+	public bool IsSome { get; }
+	public bool IsNone => !IsSome;
+
+	(...Equals and ToString overloads go here...)
+}
+						</code>
+					</pre>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>Map and Bind</h2>
+					<p>Keys to composition</p>
+				</section>
+
+				<section>
+					<h3>Map</h3>
+					<pre><code class="csharp hljs" data-trim>
+Option&lt;TOut&gt; Map&lt;TIn, TOut&gt;(this Option&lt;TIn&gt; val, Func&lt;TIn, TOut&gt; mapper) =>
+	val.IsSome ? Some(mapper(val.Value)) : None&lt;TOut&gt;();
+					</code></pre>
+					<ul>
+						<li>Map expects a function which returns not lifted value</li>
+						<li>If a parameter is Some/Success, it calls mapper and wraps it in Some/Success</li>
+						<li>If a parameter is None/Failure, it returns None/Error of the output type</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Bind</h3>
+					<pre><code class="csharp hljs" data-trim>
+Option&lt;TOut&gt; Bind&lt;TIn, TOut&gt;(this Option&lt;TIn&gt; val, Func&lt;TIn, Option&lt;TOut&gt;&gt; binder) =>
+	val.IsSome ? binder(val.Value) : None&lt;TOut&gt;();
+					</code></pre>
+					<ul>
+						<li>Bind expects a function which returns lifted value</li>
+						<li>If a parameter is Some/Success, it returns the result of a binder call</li>
+						<li>If a parameter is None/Failure, it returns None/Error of the output type</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>Introducing Flows</h2>
+					<p>Making the important things explicit</p>
+				</section>
+
+				<section>
+					<h3>Flows</h3>
+					<ul>
+						<li>Making the important things visible at the first glance</li>
+						<li>Flattening the class structure</li>
+						<li>Getting rid of messy <code>if</code> statements</li>
+						<li>Reducing the need to name things</li>
+						<li>Making composition and code reuse much easier</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Flow - Map and Bind in action</h3>
+					<pre><code class="csharp hljs">
+public Result&lt;OperationResultDto&gt; Execute(OperationDto dto) =>
+	InputValidation.Validate(dto)
+	.Map(IntentMapper.Map)
+	.Bind(_contextProvider.ProvideContext)
+	.Bind(_businessValidation.Validate)
+	.Map(Executor.Execute)
+	.Map(SummaryCalculator.Calculate)
+	.Bind(_storage.Persist)
+	.Map(ResponseMapper.Map);
+					</code></pre>
+				</section>
+
+				<section>
+					<h3>Flow - let's try without Map and Bind</h3>
+					<pre><code class="csharp hljs">
+public Result&lt;OperationResultDto&gt; Execute(OperationDto dto)
+{
+	var validationResult = InputValidation.Validate(dto);
+	if (validationResult.IsFailure) return ResponseMapper.Map(...magic to map it to response);
+	var intent = IntentMapper.Map(validationResult.Value);
+	var contextResult = _contextProvider.ProvideContext(intent);
+	if (contextResult.IsFailure) return ResponseMapper.Map(...magic to map it to response);
+	var businessValidationResult = _businessValidation.Validate(contextResult.Value);
+	if (businessValidationResult.IsFailure) return ResponseMapper.Map(...magic to map it to response);
+	var result = Executor.Execute(businessValidationResult.Value);
+	var summary = SummaryCalculator.Calculate(result);
+	var storageResult = _storage.Persist(summary);
+	return ResponseMapper.Map(storageResult);
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<h3>Map and Bind - benefits</h3>
+					<ul>
+						<li>Extremely simple</li>
+						<li>Reduced noise</li>
+						<li>Less code</li>
+						<li>They enable composability</li>
+						<li>Once learned, can be reused for different types</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>What else did we need?</h3>
+					<p>Set of static helper functions</p>
+					<ul>
+						<li>Async/Task support</li>
+						<li>Tuple support</li>
+						<li>Collection support</li>
+						<li>Conversion functions between Result and Option</li>
+						<li>Conversion functions from other types (Nullable, String, Object, etc.)</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>Other important decisions</h2>
+					<p>Small changes that can have big impact</p>
+				</section>
+
+				<section>
+					<h3>Decouple the data from the behaviour</h3>
+					<ul>
+						<li>The only logic in data structure is captured within constructor</li>
+						<li>Enables extendability and composability</li>
+						<li>Less problems with mocking</li>
+						<li>Makes immutability a lot easier</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Use immutable data structures whenever possible</h3>
+					<ul>
+						<li>Limits the risk of incompatible behaviour between the calls</li>
+						<li>Makes reasoning about the code much simpler</li>
+						<li>Makes creating illegal states much harder</li>
+						<li>Use structs for short living data structures</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Dependency Injection is not a swiss army knife</h3>
+					<ul>
+						<li>Use it only for dependencies with side effects</li>
+						<li>Use static references for functions without side effects</li>
+						<li>The lower you get into class structure, the less you need DI</li>
+						<li>Less DI => less code</li>
+						<li>Surprisingly, makes testing a lot of things much easier</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Context - capturing the state</h3>
+					<ul>
+						<li>Context captures all the things needed to execute the flow</li>
+						<li>Makes reasoning about the code easier</li>
+						<li>Passing the data between the steps is much simpler</li>
+						<li>All the data required for the operation is gathered upfront and available for further steps</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>C# in a world of functions</h2>
+					<p>The Good, The Bad and The Ugly</p>
+				</section>
+
+				<section>
+					<h3>C# 6 (and older) - useful features</h3>
+					<ul>
+						<li>Importing dependencies with <code>using static</code></li>
+						<li>Method and property expressions</li>
+						<li>Anonymous objects</li>
+						<li>Tuples</li>
+						<li>Extension methods</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>C# 7 features we're hoping to use</h3>
+					<ul>
+						<li>Better support for tuples</li>
+						<li>Pattern matching - very limited but still better than none</li>
+						<li>Local functions</li>
+						<li>More expression bodied members</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>The biggest issues with C# that we couldn't overcome #1</h3>
+					<ul>
+						<li>Immutability is a pain - no language level support for it</li>
+						<li>Cloning immutable objects is almost impossible</li>
+						<li>Equality comparison for reference types requires a lot of effort</li>
+						<li>No algebraic types makes representing this-or-this-or... types cumbersome</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>The biggest issues with C# that we couldn't overcome #2</h3>
+					<ul>
+						<li>No powerful pattern matching makes code much more complicated than it should be</li>
+						<li>No partial application and currying</li>
+						<li>Complicated function parameter syntax</li>
+						<li>No pipe operator means we have to name too many things</li>
+						<li>Language version is coupled to the tooling version</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<h2>Inspirations</h2>
+				<ul>
+					<li>F# (ML) language design</li>
+					<li>Scott Wlaschin - his website <a href="https://fsharpforfunandprofit.com/">fsharpforfunandprofit.com</a>
+					and his presentations (especially ones about Railway Oriented Programming, Dr Frankenfunctor and the Monadster, Domain Driven Design)</li>
+					<li>React and Redux</li>
+				</ul>
+			</section>
+
+			<section>
+				<h1>THE END</h1>
+				<br />
+				<p>Thank you for attention!</p>
+				<p>Bartosz Sokół</p>
+				<p><small><img src="img/twitter.png" class="inline" /> @bartsokol</small></p>
+				<p><small>4developers 2017</small></p>
+			</section>
+		</div>
+	</div>
+
+	<script src="lib/js/head.min.js"></script>
+	<script src="js/reveal.js"></script>
+
+	<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js' },
+					{ src: 'plugin/print-pdf/print-pdf.js' }
+				]
+			});
+	</script>
+</body>
+
+</html>
